@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "602466815590",
+    "project_id": "tastebud-ae47a",
+    "storage_bucket": "tastebud-ae47a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:602466815590:android:8ad4d671cabd66385767a7",
+        "android_client_info": {
+          "package_name": "com.example.tastebud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxyhUouHunuP8YmOV5aT-_Hs1HB0slWYg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
