@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.tastebud.ui.screens.DashboardScreen
 import com.example.tastebud.ui.screens.ForgotPasswordScreen
 import com.example.tastebud.ui.screens.LoginScreen
 import com.example.tastebud.ui.screens.RegisterScreen
@@ -27,5 +28,9 @@ fun TasteBudNavGraph(navController: NavHostController) {
         composable(route = Screen.ForgotPassword.route) {
             ForgotPasswordScreen(navController)
         }
+        composable(route = Screen.Dashboard.route) {
+            DashboardScreen(navController)
+        }
+
     }
 }

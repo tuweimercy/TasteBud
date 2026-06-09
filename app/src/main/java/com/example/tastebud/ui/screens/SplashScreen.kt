@@ -21,15 +21,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.tastebud.navigation.Screen
 import com.example.tastebud.ui.theme.TasteBudTheme
+import com.example.tastebud.viewmodel.AuthState
+import com.example.tastebud.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun SplashScreen(navController: NavController,
+                 authViewModel: AuthViewModel = viewModel()
+) {
+    val authState by authViewModel.authState.collectAsState()
     val scale = remember { Animatable(0f) }
     
     // Sophisticated Pink Gradient
@@ -40,7 +46,6 @@ fun SplashScreen(navController: NavController) {
             Color(0xFF880E4F)  // Dark Pink
         )
     )
-
     LaunchedEffect(Unit) {
         scale.animateTo(
             targetValue = 1f,
@@ -48,12 +53,47 @@ fun SplashScreen(navController: NavController) {
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessLow
             )
+
         )
-        delay(3000)
-        navController.navigate(Screen.Login.route) {
-            popUpTo(Screen.Splash.route) { inclusive = true }
+        delay(1500)}
+    //launched efect with viewmodel
+    LaunchedEffect(authState) {
+        //if user is logged in redirect to dashboard
+        //else redirect to login screen
+        when (authState) {
+            //success
+            is AuthState.Success -> {
+                navController.navigate(Screen.Dashboard.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+
+            }
+
+            is AuthState.Idle , is AuthState.Logout -> {
+                delay(1400)
+                navController.navigate(Screen.Login.route){
+                    popUpTo(Screen.Splash.route){inclusive = true}
+
+                }
+            }
+            else -> Unit
+
         }
     }
+
+//    LaunchedEffect(Unit) {
+//        scale.animateTo(
+//            targetValue = 1f,
+//            animationSpec = spring(
+//                dampingRatio = Spring.DampingRatioMediumBouncy,
+//                stiffness = Spring.StiffnessLow
+//            )
+//        )
+//        delay(3000)
+//        navController.navigate(Screen.Login.route) {
+//            popUpTo(Screen.Splash.route) { inclusive = true }
+//        }
+//    }
 
     Box(
         modifier = Modifier

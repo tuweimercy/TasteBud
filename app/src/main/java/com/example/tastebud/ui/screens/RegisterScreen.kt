@@ -32,14 +32,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.tastebud.navigation.Screen
 import com.example.tastebud.ui.theme.TasteBudTheme
+import com.example.tastebud.viewmodel.AuthState
+import com.example.tastebud.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -47,6 +50,9 @@ fun RegisterScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var selectedRole by remember { mutableStateOf("Student") }
     val roles = listOf("Student", "Teacher")
+    val authState by authViewModel.authState.collectAsState()
+    val isLoading = authState is AuthState.Loading
+    val errorMessage = (authState as? AuthState.Error)?.message
 
     val pinkGradient = Brush.linearGradient(
         colors = listOf(
@@ -55,6 +61,13 @@ fun RegisterScreen(navController: NavController) {
             Color(0xFF880E4F)
         )
     )
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            navController.navigate(Screen.Dashboard.route) {
+                popUpTo(Screen.Register.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
