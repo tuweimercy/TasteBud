@@ -1,5 +1,6 @@
 package com.example.tastebud.ui.screens
 
+import android.R.attr.enabled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -28,17 +29,27 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.tastebud.navigation.Screen
 import com.example.tastebud.ui.theme.TasteBudTheme
+import com.example.tastebud.viewmodel.AuthState
+import com.example.tastebud.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController,
+                authViewModel: AuthViewModel = viewModel()
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    val authState by authViewModel.authState.collectAsState()
+    val isLoading = authState is AuthState.Loading
+    val errorMessage = (authState as? AuthState.Error)?.message
+
+
 
     val pinkGradient = Brush.linearGradient(
         colors = listOf(
@@ -47,6 +58,14 @@ fun LoginScreen(navController: NavController) {
             Color(0xFF880E4F)
         )
     )
+    LaunchedEffect(authState
+    ) {
+        if(authState is AuthState.Success){
+            navController.navigate(Screen.Dashboard.route){
+                popUpTo(Screen.Login.route) {inclusive = true}
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -171,26 +190,50 @@ fun LoginScreen(navController: NavController) {
             }
             
             Spacer(Modifier.height(20.dp))
-            
             Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63))
+                onClick = {
+                    authViewModel.Login(email,password)
+                },
+                modifier= Modifier.fillMaxWidth().height(52.dp),
+                shape=RoundedCornerShape(12.dp),
+                colors= ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63)),
+                enabled= email.isNotBlank() && password.isNotBlank()
+                        && !isLoading
             ) {
-                Text(
-                    text = "Sign in",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White
-                )
+                if(isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Sign In",style=MaterialTheme.typography
+                        .bodyLarge)
+                }
             }
+            
+//            Button(
+//                onClick = {},
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(52.dp),
+//                shape = RoundedCornerShape(12.dp),
+//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63))
+//            ) {
+//                Text(
+//                    text = "Sign in",
+//                    style = MaterialTheme.typography.bodyLarge,
+//                    color = Color.White
+//                )
+//            }
             
             Spacer(Modifier.height(16.dp))
             
             TextButton(
-                onClick = { navController.navigate(Screen.Register.route) }
+                onClick = {
+
+                    authViewModel.clearState()
+                    navController.navigate(Screen.Register.route) }
             ) {
                 Text(
                     text = "Don't have an account? Register",

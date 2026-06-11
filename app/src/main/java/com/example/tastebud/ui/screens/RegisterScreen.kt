@@ -42,7 +42,7 @@ import com.example.tastebud.viewmodel.AuthState
 import com.example.tastebud.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel) {
+fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = viewModel()) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -52,7 +52,6 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel) {
     val roles = listOf("Student", "Teacher")
     val authState by authViewModel.authState.collectAsState()
     val isLoading = authState is AuthState.Loading
-    val errorMessage = (authState as? AuthState.Error)?.message
 
     val pinkGradient = Brush.linearGradient(
         colors = listOf(
@@ -81,35 +80,30 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel) {
                 .padding(horizontal = 24.dp, vertical = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Logo Badge with Picture
+            // Logo Badge (Matching Splash/Login Structure)
             Box(
-                modifier = Modifier.size(120.dp),
+                modifier = Modifier
+                    .size(160.dp)
+                    .shadow(12.dp, CircleShape)
+                    .border(4.dp, pinkGradient, CircleShape)
+                    .clip(CircleShape)
+                    .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                // Circular Image with Border
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .shadow(12.dp, CircleShape)
-                        .border(4.dp, pinkGradient, CircleShape)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                ) {
-                    AsyncImage(
-                        model = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop",
-                        contentDescription = "Logo Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                AsyncImage(
+                    model = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop",
+                    contentDescription = "Logo Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
                 
-                // Overlay icon - Moved outside the clip and adjusted position
+                // Overlay icon - Positioned inside to stay within the circular badge
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = 4.dp, end = 4.dp)
-                        .size(36.dp)
-                        .shadow(6.dp, CircleShape)
+                        .padding(bottom = 12.dp, end = 12.dp)
+                        .size(40.dp)
+                        .shadow(4.dp, CircleShape)
                         .background(pinkGradient, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
@@ -117,7 +111,7 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel) {
                         imageVector = Icons.AutoMirrored.Filled.MenuBook,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -245,26 +239,36 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel) {
             }
 
             Spacer(Modifier.height(28.dp))
-
             Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63))
+                onClick = {
+                    if(password == confirmPassword){
+                        authViewModel.register(fullName,email,password,
+                            selectedRole)
+                    }
+                },
+                modifier= Modifier.fillMaxWidth().height(52.dp),
+                shape=RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63)),
+                enabled= fullName.isNotBlank() && email.isNotBlank()
+                        && password.isNotBlank() &&
+                        password == confirmPassword && !isLoading
             ) {
-                Text(
-                    text = "Create Account",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White
-                )
+                if(isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Create Account",style=MaterialTheme.typography
+                        .bodyLarge)
+                }
             }
 
             Spacer(Modifier.height(16.dp))
 
             TextButton(
-                onClick = {
+                onClick = { authViewModel.clearState()
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Register.route) { inclusive = true }
                     }

@@ -24,15 +24,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.tastebud.ui.theme.TasteBudTheme
+import com.example.tastebud.viewmodel.AuthState
+import com.example.tastebud.viewmodel.AuthViewModel
 
 @Composable
-fun ForgotPasswordScreen(navController: NavController) {
+fun ForgotPasswordScreen(navController: NavController,
+                         authViewModel: AuthViewModel = viewModel()
+) {
     var email by remember { mutableStateOf("") }
     var sent by remember { mutableStateOf(false) }
+    val authState by authViewModel.authState.collectAsState()
+    val isLoading = authState is AuthState.Loading
+    val isResetSent = authState is AuthState.PasswordResetSent
+    val errorMessage = (authState as? AuthState.Error)?.message
+
+    // clean up the states when vacating this screen
+    DisposableEffect(Unit) {
+        onDispose { authViewModel.clearState() }
+    }
 
     val pinkGradient = Brush.linearGradient(
         colors = listOf(
@@ -69,35 +83,30 @@ fun ForgotPasswordScreen(navController: NavController) {
 
             Spacer(Modifier.height(20.dp))
             
-            // Logo Badge with Picture
+            // Logo Badge (Matching Splash/Login Structure)
             Box(
-                modifier = Modifier.size(120.dp),
+                modifier = Modifier
+                    .size(160.dp)
+                    .shadow(12.dp, CircleShape)
+                    .border(4.dp, pinkGradient, CircleShape)
+                    .clip(CircleShape)
+                    .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                // Circular Image with Border
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .shadow(12.dp, CircleShape)
-                        .border(4.dp, pinkGradient, CircleShape)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                ) {
-                    AsyncImage(
-                        model = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop",
-                        contentDescription = "Logo Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                AsyncImage(
+                    model = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop",
+                    contentDescription = "Logo Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
                 
-                // Overlay icon - Placed outside the inner clipped Box
+                // Overlay icon - Positioned inside to stay within the circular badge
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = 4.dp, end = 4.dp)
-                        .size(36.dp)
-                        .shadow(6.dp, CircleShape)
+                        .padding(bottom = 12.dp, end = 12.dp)
+                        .size(40.dp)
+                        .shadow(4.dp, CircleShape)
                         .background(pinkGradient, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
@@ -105,7 +114,7 @@ fun ForgotPasswordScreen(navController: NavController) {
                         imageVector = Icons.AutoMirrored.Filled.MenuBook,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -131,7 +140,7 @@ fun ForgotPasswordScreen(navController: NavController) {
 
             Spacer(Modifier.height(8.dp))
 
-            if (sent) {
+            if (isResetSent && sent) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFE91E63).copy(alpha = 0.1f)),
                     shape = RoundedCornerShape(12.dp),
@@ -185,7 +194,8 @@ fun ForgotPasswordScreen(navController: NavController) {
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick = { sent = true },
+                    onClick = { sent = true
+                        authViewModel.sendPasswordReset(email)},
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     enabled = email.isNotBlank(),
