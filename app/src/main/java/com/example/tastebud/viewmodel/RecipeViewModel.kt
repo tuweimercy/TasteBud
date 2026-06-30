@@ -4,11 +4,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tastebud.model.Recipe
+import com.example.tastebud.utils.CloudinaryUploader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.example.tastebud.model.Recipe
-import com.example.tastebud.utils.CloudinaryUploader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -30,42 +30,58 @@ class RecipeViewModel : ViewModel() {
 
     private val _uploadProgress = MutableStateFlow(0f)
     val uploadProgress: StateFlow<Float> = _uploadProgress
+//
+//    fun loadPublicRecipes() {
+//        viewModelScope.launch {
+//            try {
+//                val snapshot = db.collection("recipes")
+//                    .whereEqualTo("isPublic", true)
+//                    .orderBy("uploadedAt", Query.Direction.DESCENDING)
+//                    .get()
+//                    .await()
+//
+//                _publicRecipes.value = snapshot.documents.mapNotNull {
+//                    it.toObject(Recipe::class.java)?.copy(id = it.id)
+//                }
+//
+//            } catch (e: Exception) {
+//                _recipeState.value =
+//                    RecipeState.Error(e.message ?: "Failed to load recipes")
+//            }
+//        }
+//    }
+fun loadPublicRecipes() {
 
-    fun loadPublicRecipes() {
+    viewModelScope.launch {
 
-        viewModelScope.launch {
+        try {
 
-            try {
+            val snapshot = db.collection("recipes")
+                .orderBy("uploadedAt", Query.Direction.DESCENDING)
+                .get()
+                .await()
 
-                val snapshot = db.collection("recipes")
-                    .orderBy("uploadedAt", Query.Direction.DESCENDING)
-                    .get()
-                    .await()
+            _publicRecipes.value =
+                snapshot.documents.mapNotNull {
+                    it.toObject(Recipe::class.java)?.copy(id = it.id)
+                }
 
-                _publicRecipes.value =
-                    snapshot.documents.mapNotNull {
+        } catch (e: Exception) {
 
-                        it.toObject(Recipe::class.java)?.copy(id = it.id)
-
-                    }
-
-            } catch (e: Exception) {
-
-                _recipeState.value =
-                    RecipeState.Error(e.message ?: "Failed to load recipes")
-
-            }
+            _recipeState.value =
+                RecipeState.Error(e.message ?: "Failed to load recipes")
 
         }
 
     }
+
+}
 
     fun loadMyRecipes() {
 
         val uid = auth.currentUser?.uid ?: return
 
         viewModelScope.launch {
-
             try {
 
                 val snapshot = db.collection("recipes")
@@ -74,31 +90,26 @@ class RecipeViewModel : ViewModel() {
                     .get()
                     .await()
 
-                _myRecipes.value =
-                    snapshot.documents.mapNotNull {
-
-                        it.toObject(Recipe::class.java)?.copy(id = it.id)
-
-                    }
+                _myRecipes.value = snapshot.documents.mapNotNull {
+                    it.toObject(Recipe::class.java)?.copy(id = it.id)
+                }
 
             } catch (e: Exception) {
-
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Failed to load recipes")
-
             }
-
         }
-
     }
 
     fun uploadRecipe(
         context: Context,
-        recipeName: String,
+        title: String,
         ingredients: String,
         instructions: String,
         category: String,
+        cookingTime: Int,
         imageUri: Uri,
+        isPublic: Boolean,
         ownerName: String
     ) {
 
@@ -110,21 +121,22 @@ class RecipeViewModel : ViewModel() {
 
             try {
 
-                val imageUrl =
-                    CloudinaryUploader.uploadImage(
-                        context = context,
-                        imageUri = imageUri,
-                        onProgress = {
-                            _uploadProgress.value = it
-                        }
-                    )
+                val imageUrl = CloudinaryUploader.uploadImage(
+                    context = context,
+                    imageUri = imageUri,
+                    onProgress = {
+                        _uploadProgress.value = it
+                    }
+                )
 
                 val recipe = Recipe(
-                    title = recipeName,
+                    title = title,
                     ingredients = ingredients,
                     instructions = instructions,
                     imageUrl = imageUrl,
                     category = category,
+                    cookingTime = cookingTime,
+                    isPublic = isPublic,
                     ownerName = ownerName,
                     ownerId = uid
                 )
@@ -134,30 +146,32 @@ class RecipeViewModel : ViewModel() {
                     .await()
 
                 _uploadProgress.value = 0f
-
                 _recipeState.value = RecipeState.Success
+
+                loadPublicRecipes()
+                loadMyRecipes()
 
             } catch (e: Exception) {
 
+                e.printStackTrace()
+
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Upload failed")
-
             }
-
         }
-
     }
+
     fun updateRecipe(
         recipeId: String,
-        recipeName: String,
+        title: String,
         ingredients: String,
         instructions: String,
-        category: String
+        category: String,
+        cookingTime: Int,
+        isPublic: Boolean
     ) {
 
         viewModelScope.launch {
-
-            _recipeState.value = RecipeState.Loading
 
             try {
 
@@ -165,25 +179,27 @@ class RecipeViewModel : ViewModel() {
                     .document(recipeId)
                     .update(
                         mapOf(
-                            "title" to recipeName,
+                            "title" to title,
                             "ingredients" to ingredients,
                             "instructions" to instructions,
-                            "category" to category
+                            "category" to category,
+                            "cookingTime" to cookingTime,
+                            "isPublic" to isPublic
                         )
                     )
                     .await()
 
                 _recipeState.value = RecipeState.Success
 
+                loadPublicRecipes()
+                loadMyRecipes()
+
             } catch (e: Exception) {
 
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Update failed")
-
             }
-
         }
-
     }
 
     fun deleteRecipe(recipe: Recipe) {
@@ -199,21 +215,18 @@ class RecipeViewModel : ViewModel() {
 
                 _recipeState.value = RecipeState.Success
 
+                loadPublicRecipes()
+                loadMyRecipes()
+
             } catch (e: Exception) {
 
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Delete failed")
-
             }
-
         }
-
     }
 
     fun clearState() {
-
         _recipeState.value = RecipeState.Idle
-
     }
-
 }

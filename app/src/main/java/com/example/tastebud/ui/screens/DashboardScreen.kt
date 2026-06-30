@@ -20,26 +20,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.tastebud.navigation.Screen
 import com.example.tastebud.ui.components.AppBottomBar
 import com.example.tastebud.viewmodel.AuthViewModel
+import com.example.tastebud.viewmodel.RecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    recipeViewModel: RecipeViewModel = viewModel()
 ) {
 
     val Pink = Color(0xFFE91E63)
     val LightPink = Color(0xFFFFF5F8)
-    val SoftPink = Color(0xFFF8BBD0)
 
-    var search by remember {
-        mutableStateOf("")
+    var search by remember { mutableStateOf("") }
+
+    var selectedCategory by remember {
+        mutableStateOf("All")
     }
 
     val categories = listOf(
+        "All",
         "Breakfast",
         "Lunch",
         "Dinner",
@@ -47,6 +52,24 @@ fun DashboardScreen(
         "Snacks",
         "Drinks"
     )
+
+    val recipes by recipeViewModel.publicRecipes.collectAsState()
+
+    LaunchedEffect(Unit) {
+        recipeViewModel.loadPublicRecipes()
+    }
+
+    val filteredRecipes = recipes.filter {
+
+        (selectedCategory == "All" ||
+                it.category == selectedCategory) &&
+
+                it.title.contains(
+                    search,
+                    ignoreCase = true
+                )
+
+    }
 
     Scaffold(
 
@@ -91,8 +114,8 @@ fun DashboardScreen(
                     ) {
 
                         Icon(
-                            imageVector = Icons.Default.ExitToApp,
-                            contentDescription = "Logout",
+                            Icons.Default.ExitToApp,
+                            contentDescription = null,
                             tint = Color.White
                         )
 
@@ -110,28 +133,40 @@ fun DashboardScreen(
                 currentRoute = Screen.Dashboard.route,
 
                 onDashboardClick = {
-                    navController.navigate(Screen.Dashboard.route)
+
+                    navController.navigate(Screen.Dashboard.route) {
+                        launchSingleTop = true
+                    }
+
                 },
 
-                onFavoritesClick = {
-                    navController.navigate(Screen.Dashboard.route)
+                onMyRecipesClick = {
+
+                    navController.navigate(Screen.Favorites.route) {
+                        launchSingleTop = true
+                    }
+
                 },
 
                 onUploadClick = {
-                    navController.navigate(Screen.UploadRecipe.route)
+
+                    navController.navigate(Screen.UploadRecipe.route) {
+                        launchSingleTop = true
+                    }
+
                 },
 
                 onProfileClick = {
-                    navController.navigate(Screen.Dashboard.route)
+
+                    navController.navigate(Screen.Profile.route) {
+                        launchSingleTop = true
+                    }
+
                 }
 
             )
 
         },
-
-
-
-
 
         floatingActionButton = {
 
@@ -139,7 +174,7 @@ fun DashboardScreen(
 
                 onClick = {
 
-                    navController.navigate("upload_recipe")
+                    navController.navigate(Screen.UploadRecipe.route)
 
                 },
 
@@ -174,10 +209,15 @@ fun DashboardScreen(
             item {
 
                 Text(
+
                     text = "Welcome to TasteBud 👋",
+
                     style = MaterialTheme.typography.headlineMedium,
+
                     color = Pink,
+
                     fontWeight = FontWeight.Bold
+
                 )
 
             }
@@ -189,7 +229,9 @@ fun DashboardScreen(
                     value = search,
 
                     onValueChange = {
+
                         search = it
+
                     },
 
                     modifier = Modifier.fillMaxWidth(),
@@ -203,17 +245,25 @@ fun DashboardScreen(
                     leadingIcon = {
 
                         Icon(
-                            imageVector = Icons.Default.Search,
+
+                            Icons.Default.Search,
+
                             contentDescription = null,
+
                             tint = Pink
+
                         )
 
                     },
 
                     colors = OutlinedTextFieldDefaults.colors(
+
                         focusedBorderColor = Pink,
+
                         focusedLabelColor = Pink,
+
                         cursorColor = Pink
+
                     ),
 
                     shape = RoundedCornerShape(15.dp)
@@ -225,14 +275,93 @@ fun DashboardScreen(
             item {
 
                 Text(
-                    text = "Recipe Categories",
+
+                    text = "Categories",
+
                     style = MaterialTheme.typography.titleLarge,
-                    color = Pink,
-                    fontWeight = FontWeight.Bold
+
+                    fontWeight = FontWeight.Bold,
+
+                    color = Pink
+
                 )
 
             }
+
             items(categories) { category ->
+
+                ElevatedButton(
+
+                    onClick = {
+
+                        selectedCategory = category
+
+                    },
+
+                    colors = ButtonDefaults.buttonColors(
+
+                        containerColor =
+                            if (selectedCategory == category)
+                                Pink
+                            else
+                                Color.White
+
+                    ),
+
+                    modifier = Modifier.fillMaxWidth()
+
+                ) {
+
+                    Icon(
+
+                        Icons.Default.Fastfood,
+
+                        contentDescription = null,
+
+                        tint =
+                            if (selectedCategory == category)
+                                Color.White
+                            else
+                                Pink
+
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+
+                        text = category,
+
+                        color =
+                            if (selectedCategory == category)
+                                Color.White
+                            else
+                                Pink
+
+                    )
+
+                }
+
+            }
+
+            item {
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+
+                    text = "Uploaded Recipes",
+
+                    style = MaterialTheme.typography.titleLarge,
+
+                    fontWeight = FontWeight.Bold,
+
+                    color = Pink
+
+                )
+
+            }
+            items(filteredRecipes) { recipe ->
 
                 Card(
 
@@ -241,7 +370,7 @@ fun DashboardScreen(
                     shape = RoundedCornerShape(18.dp),
 
                     colors = CardDefaults.cardColors(
-                        containerColor = SoftPink
+                        containerColor = Color.White
                     ),
 
                     elevation = CardDefaults.cardElevation(
@@ -250,91 +379,127 @@ fun DashboardScreen(
 
                 ) {
 
-                    Row(
-
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-
-                        verticalAlignment = Alignment.CenterVertically
-
+                    Column(
+                        modifier = Modifier.padding(16.dp)
                     ) {
 
-                        Box(
+                        if (recipe.imageUrl.isNotEmpty()) {
 
-                            modifier = Modifier
-                                .size(55.dp)
-                                .background(
-                                    color = Pink,
-                                    shape = CircleShape
-                                ),
+                            AsyncImage(
 
-                            contentAlignment = Alignment.Center
+                                model = recipe.imageUrl,
 
-                        ) {
+                                contentDescription = recipe.title,
 
-                            Icon(
-
-                                imageVector = Icons.Default.Fastfood,
-
-                                contentDescription = null,
-
-                                tint = Color.White
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
 
                             )
+
+                            Spacer(modifier = Modifier.height(12.dp))
 
                         }
 
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
 
-                        Column(
-                            modifier = Modifier.weight(1f)
+                            text = recipe.title,
+
+                            style = MaterialTheme.typography.titleLarge,
+
+                            fontWeight = FontWeight.Bold,
+
+                            color = Pink
+
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+
+                            text = recipe.category,
+
+                            style = MaterialTheme.typography.bodyMedium,
+
+                            color = Color.Gray
+
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+
+                            text = "Ingredients",
+
+                            style = MaterialTheme.typography.titleMedium,
+
+                            fontWeight = FontWeight.Bold
+
+                        )
+
+                        Text(recipe.ingredients)
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+
+                            text = "Instructions",
+
+                            style = MaterialTheme.typography.titleMedium,
+
+                            fontWeight = FontWeight.Bold
+
+                        )
+
+                        Text(recipe.instructions)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            Text(
+                            Box(
 
-                                text = category,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        Pink,
+                                        CircleShape
+                                    ),
 
-                                style = MaterialTheme.typography.titleMedium,
+                                contentAlignment = Alignment.Center
 
-                                fontWeight = FontWeight.Bold,
+                            ) {
 
-                                color = Pink
+                                Text(
 
-                            )
+                                    text = recipe.ownerName.first()
+                                        .uppercase(),
 
-                            Spacer(modifier = Modifier.height(4.dp))
+                                    color = Color.White,
 
-                            Text(
+                                    fontWeight = FontWeight.Bold
 
-                                text = "Explore tasty $category recipes.",
+                                )
 
-                                style = MaterialTheme.typography.bodyMedium,
+                            }
 
-                                color = Color.DarkGray
+                            Spacer(modifier = Modifier.width(10.dp))
 
-                            )
+                            Column {
 
-                        }
+                                Text(
+                                    text = recipe.ownerName,
+                                    fontWeight = FontWeight.Bold
+                                )
 
-                        Button(
+                                Text(
+                                    text = "Recipe Creator",
+                                    color = Color.Gray
+                                )
 
-                            onClick = {
-                                // Navigate to recipes in this category later
-                            },
-
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Pink
-                            ),
-
-                            shape = RoundedCornerShape(10.dp)
-
-                        ) {
-
-                            Text(
-                                text = "View",
-                                color = Color.White
-                            )
+                            }
 
                         }
 
@@ -343,10 +508,11 @@ fun DashboardScreen(
                 }
 
             }
-
             item {
 
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(
+                    modifier = Modifier.height(100.dp)
+                )
 
             }
 
