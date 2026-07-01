@@ -12,9 +12,15 @@ sealed class Screen(val route: String) {
     object Dashboard : Screen("dashboard")
     object UploadRecipe : Screen("upload_recipe")
     object RecipeDetails : Screen("recipe_details")
+    object MyRecipes : Screen("my_recipes")
+    object EditRecipe : Screen("edit_recipe/{recipeId}") {
 
-    // User Features
-    object Favorites : Screen("favorites")
+        fun createRoute(recipeId: String): String {
+            return "edit_recipe/$recipeId"
+        }
+
+    }
+
     object Profile : Screen("profile")
 
 }

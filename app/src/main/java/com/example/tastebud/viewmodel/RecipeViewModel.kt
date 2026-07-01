@@ -2,6 +2,7 @@ package com.example.tastebud.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tastebud.model.Recipe
@@ -30,58 +31,48 @@ class RecipeViewModel : ViewModel() {
 
     private val _uploadProgress = MutableStateFlow(0f)
     val uploadProgress: StateFlow<Float> = _uploadProgress
-//
-//    fun loadPublicRecipes() {
-//        viewModelScope.launch {
-//            try {
-//                val snapshot = db.collection("recipes")
-//                    .whereEqualTo("isPublic", true)
-//                    .orderBy("uploadedAt", Query.Direction.DESCENDING)
-//                    .get()
-//                    .await()
-//
-//                _publicRecipes.value = snapshot.documents.mapNotNull {
-//                    it.toObject(Recipe::class.java)?.copy(id = it.id)
-//                }
-//
-//            } catch (e: Exception) {
-//                _recipeState.value =
-//                    RecipeState.Error(e.message ?: "Failed to load recipes")
-//            }
-//        }
-//    }
-fun loadPublicRecipes() {
 
-    viewModelScope.launch {
+    fun loadPublicRecipes() {
 
-        try {
+        viewModelScope.launch {
 
-            val snapshot = db.collection("recipes")
-                .orderBy("uploadedAt", Query.Direction.DESCENDING)
-                .get()
-                .await()
+            try {
 
-            _publicRecipes.value =
-                snapshot.documents.mapNotNull {
+                val snapshot = db.collection("recipes")
+                    .orderBy("uploadedAt", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+
+                _publicRecipes.value = snapshot.documents.mapNotNull {
                     it.toObject(Recipe::class.java)?.copy(id = it.id)
                 }
 
-        } catch (e: Exception) {
+            } catch (e: Exception) {
 
-            _recipeState.value =
-                RecipeState.Error(e.message ?: "Failed to load recipes")
+                Log.e("PUBLIC_RECIPES", e.message ?: "")
+
+                _recipeState.value =
+                    RecipeState.Error(e.message ?: "Failed to load recipes")
+
+            }
 
         }
 
     }
 
-}
-
     fun loadMyRecipes() {
 
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid
+
+        if (uid == null) {
+            Log.e("MY_RECIPES", "User not logged in")
+            return
+        }
+
+        Log.d("MY_RECIPES", "Current UID = $uid")
 
         viewModelScope.launch {
+
             try {
 
                 val snapshot = db.collection("recipes")
@@ -90,15 +81,23 @@ fun loadPublicRecipes() {
                     .get()
                     .await()
 
+                Log.d("MY_RECIPES", "Recipes found = ${snapshot.size()}")
+
                 _myRecipes.value = snapshot.documents.mapNotNull {
                     it.toObject(Recipe::class.java)?.copy(id = it.id)
                 }
 
             } catch (e: Exception) {
+
+                Log.e("MY_RECIPES", e.message ?: "", e)
+
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Failed to load recipes")
+
             }
+
         }
+
     }
 
     fun uploadRecipe(
@@ -153,12 +152,15 @@ fun loadPublicRecipes() {
 
             } catch (e: Exception) {
 
-                e.printStackTrace()
+                Log.e("UPLOAD", e.message ?: "", e)
 
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Upload failed")
+
             }
+
         }
+
     }
 
     fun updateRecipe(
@@ -172,6 +174,8 @@ fun loadPublicRecipes() {
     ) {
 
         viewModelScope.launch {
+
+            _recipeState.value = RecipeState.Loading
 
             try {
 
@@ -196,10 +200,15 @@ fun loadPublicRecipes() {
 
             } catch (e: Exception) {
 
+                Log.e("UPDATE", e.message ?: "", e)
+
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Update failed")
+
             }
+
         }
+
     }
 
     fun deleteRecipe(recipe: Recipe) {
@@ -220,13 +229,19 @@ fun loadPublicRecipes() {
 
             } catch (e: Exception) {
 
+                Log.e("DELETE", e.message ?: "", e)
+
                 _recipeState.value =
                     RecipeState.Error(e.message ?: "Delete failed")
+
             }
+
         }
+
     }
 
     fun clearState() {
         _recipeState.value = RecipeState.Idle
     }
+
 }

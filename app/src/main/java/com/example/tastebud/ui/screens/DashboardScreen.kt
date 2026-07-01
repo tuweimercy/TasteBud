@@ -127,44 +127,35 @@ fun DashboardScreen(
 
         },
         bottomBar = {
-
             AppBottomBar(
-
                 currentRoute = Screen.Dashboard.route,
 
                 onDashboardClick = {
-
                     navController.navigate(Screen.Dashboard.route) {
                         launchSingleTop = true
                     }
-
                 },
 
                 onMyRecipesClick = {
-
-                    navController.navigate(Screen.Favorites.route) {
+                    navController.navigate(Screen.MyRecipes.route) {
                         launchSingleTop = true
                     }
-
                 },
 
                 onUploadClick = {
-
                     navController.navigate(Screen.UploadRecipe.route) {
                         launchSingleTop = true
                     }
-
                 },
 
                 onProfileClick = {
-
                     navController.navigate(Screen.Profile.route) {
                         launchSingleTop = true
                     }
-
                 }
-
             )
+
+
 
         },
 

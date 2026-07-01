@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.tastebud.ui.screens.*
+import com.example.tastebud.ui.screens.MyRecipesScreen
 
 @Composable
 fun TasteBudNavGraph(
@@ -41,6 +42,22 @@ fun TasteBudNavGraph(
         composable(Screen.UploadRecipe.route) {
             UploadRecipeScreen(navController)
         }
+        composable(Screen.MyRecipes.route) {
+            MyRecipesScreen(navController)
+        }
+        composable(
+            route = Screen.EditRecipe.route
+        ) { backStackEntry ->
+
+            val recipeId =
+                backStackEntry.arguments?.getString("recipeId") ?: ""
+
+            EditRecipeScreen(
+                navController = navController,
+                recipeId = recipeId
+            )
+
+        }
 //
 //        composable(Screen.RecipeDetails.route) {
 //            RecipeDetailsScreen(navController)
@@ -50,8 +67,8 @@ fun TasteBudNavGraph(
 //            FavoritesScreen(navController)
 //        }
 
-//        composable(Screen.Profile.route) {
-//            ProfileScreen(navController)}
+        composable(Screen.Profile.route) {
+            ProfileScreen(navController)}
 
 
     }

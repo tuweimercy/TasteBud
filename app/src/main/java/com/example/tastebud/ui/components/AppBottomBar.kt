@@ -5,7 +5,11 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.example.tastebud.navigation.Screen
@@ -16,53 +20,81 @@ fun AppBottomBar(
     onDashboardClick: () -> Unit,
     onMyRecipesClick: () -> Unit,
     onUploadClick: () -> Unit,
-    onProfileClick: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
+
+    val Pink = Color(0xFFE91E63)
+
     NavigationBar(
-        containerColor = Color(0xFFE91E63) // TasteBud Pink
+        containerColor = Pink
     ) {
+
         val itemColors = NavigationBarItemDefaults.colors(
-            selectedIconColor = Color(0xFFE91E63),
+            selectedIconColor = Pink,
             selectedTextColor = Color.White,
-            unselectedIconColor = Color.LightGray.copy(alpha = 0.7f),
+            unselectedIconColor = Color.LightGray,
             unselectedTextColor = Color.LightGray,
             indicatorColor = Color.White
         )
 
-        // Dashboard (Explore)
         NavigationBarItem(
             selected = currentRoute == Screen.Dashboard.route,
             onClick = onDashboardClick,
-            colors = itemColors,
-            icon = { Icon(Icons.Default.Dashboard, contentDescription = "Explore") },
-            label = { Text("Explore") }
+            icon = {
+                Icon(
+                    Icons.Default.Dashboard,
+                    contentDescription = "Explore"
+                )
+            },
+            label = {
+                Text("Explore")
+            },
+            colors = itemColors
         )
 
-        // My Recipes
         NavigationBarItem(
-            selected = currentRoute == Screen.Favorites.route,
+            selected = currentRoute == Screen.MyRecipes.route,
             onClick = onMyRecipesClick,
-            colors = itemColors,
-            icon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = "My Recipes") },
-            label = { Text("My Recipes") }
+            icon = {
+                Icon(
+                    Icons.AutoMirrored.Filled.MenuBook,
+                    contentDescription = "My Recipes"
+                )
+            },
+            label = {
+                Text("My Recipes")
+            },
+            colors = itemColors
         )
 
-        // Upload
         NavigationBarItem(
             selected = currentRoute == Screen.UploadRecipe.route,
             onClick = onUploadClick,
-            colors = itemColors,
-            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Upload") },
-            label = { Text("Upload") }
+            icon = {
+                Icon(
+                    Icons.Default.AddCircle,
+                    contentDescription = "Upload"
+                )
+            },
+            label = {
+                Text("Upload")
+            },
+            colors = itemColors
         )
 
-        // Profile
         NavigationBarItem(
             selected = currentRoute == Screen.Profile.route,
             onClick = onProfileClick,
-            colors = itemColors,
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profile") }
+            icon = {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = "Profile"
+                )
+            },
+            label = {
+                Text("Profile")
+            },
+            colors = itemColors
         )
     }
 }
