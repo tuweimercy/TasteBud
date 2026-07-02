@@ -1,5 +1,5 @@
-package com.example.tastebud.ui.screens
 
+package com.example.tastebud.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -49,7 +49,7 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = v
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var selectedRole by remember { mutableStateOf("Student") }
-    val roles = listOf("Student", "Teacher")
+//    val roles = listOf("Student", "Teacher")
     val authState by authViewModel.authState.collectAsState()
     val isLoading = authState is AuthState.Loading
 
@@ -96,7 +96,7 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = v
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                
+
                 // Overlay icon - Positioned inside to stay within the circular badge
                 Box(
                     modifier = Modifier
@@ -134,7 +134,7 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = v
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color(0xFF880E4F)
             )
-            
+
             Text(
                 text = "Join TasteBud Today",
                 style = MaterialTheme.typography.bodyLarge,
@@ -216,34 +216,34 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = v
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                roles.forEach { role ->
-                    val selected = selectedRole == role
-                    FilterChip(
-                        selected = selected,
-                        onClick = { selectedRole = role },
-                        label = { Text(role) },
-                        leadingIcon = {
-                            Icon(
-                                if (role == "Teacher") Icons.Default.School else Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFFE91E63),
-                            selectedLabelColor = Color.White,
-                            selectedLeadingIconColor = Color.White
-                        )
-                    )
-                }
+//                roles.forEach { role ->
+//                    val selected = selectedRole == role
+//                    FilterChip(
+//                        selected = selected,
+//                        onClick = { selectedRole = role },
+//                        label = { Text(role) },
+//                        leadingIcon = {
+//                            Icon(
+//                                if (role == "Teacher") Icons.Default.School else Icons.Default.Person,
+//                                contentDescription = null,
+//                                modifier = Modifier.size(18.dp)
+//                            )
+//                        },
+//                        colors = FilterChipDefaults.filterChipColors(
+//                            selectedContainerColor = Color(0xFFE91E63),
+//                            selectedLabelColor = Color.White,
+//                            selectedLeadingIconColor = Color.White
+//                        )
+//                    )
+//                }
             }
 
             Spacer(Modifier.height(28.dp))
             Button(
                 onClick = {
                     if(password == confirmPassword){
-                        authViewModel.register(fullName,email,password,
-                            selectedRole)
+                        authViewModel.register(fullName,email,password,)
+//                            selectedRole)
                     }
                 },
                 modifier= Modifier.fillMaxWidth().height(52.dp),

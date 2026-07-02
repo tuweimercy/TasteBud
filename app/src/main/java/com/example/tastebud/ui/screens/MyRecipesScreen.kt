@@ -43,10 +43,9 @@ fun MyRecipesScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         item {
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(60.dp)) // Increased from 30.dp
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -57,17 +56,27 @@ fun MyRecipesScreen(
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
 
-                Text(
-                    text = "🍽 My Recipes",
-                    modifier = Modifier.padding(20.dp),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 22.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Text(
+                        text = "🍽 My Recipes",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                }
 
             }
 
         }
+
+
 
         if (recipes.isEmpty()) {
 

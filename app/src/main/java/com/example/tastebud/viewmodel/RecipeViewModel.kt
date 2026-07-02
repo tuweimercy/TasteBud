@@ -31,7 +31,6 @@ class RecipeViewModel : ViewModel() {
 
     private val _uploadProgress = MutableStateFlow(0f)
     val uploadProgress: StateFlow<Float> = _uploadProgress
-
     fun loadPublicRecipes() {
 
         viewModelScope.launch {
@@ -39,6 +38,7 @@ class RecipeViewModel : ViewModel() {
             try {
 
                 val snapshot = db.collection("recipes")
+                    .whereEqualTo("isPublic", true)
                     .orderBy("uploadedAt", Query.Direction.DESCENDING)
                     .get()
                     .await()
@@ -49,10 +49,10 @@ class RecipeViewModel : ViewModel() {
 
             } catch (e: Exception) {
 
-                Log.e("PUBLIC_RECIPES", e.message ?: "")
+                Log.e("PUBLIC_RECIPES", e.message ?: "", e)
 
                 _recipeState.value =
-                    RecipeState.Error(e.message ?: "Failed to load recipes")
+                    RecipeState.Error(e.message ?: "Failed to load public recipes")
 
             }
 
@@ -60,16 +60,10 @@ class RecipeViewModel : ViewModel() {
 
     }
 
+    // PUBLIC RECIPES (Dashboard)
     fun loadMyRecipes() {
 
-        val uid = auth.currentUser?.uid
-
-        if (uid == null) {
-            Log.e("MY_RECIPES", "User not logged in")
-            return
-        }
-
-        Log.d("MY_RECIPES", "Current UID = $uid")
+        val uid = auth.currentUser?.uid ?: return
 
         viewModelScope.launch {
 
@@ -81,24 +75,34 @@ class RecipeViewModel : ViewModel() {
                     .get()
                     .await()
 
-                Log.d("MY_RECIPES", "Recipes found = ${snapshot.size()}")
-
-                _myRecipes.value = snapshot.documents.mapNotNull {
+                val list = snapshot.documents.mapNotNull {
                     it.toObject(Recipe::class.java)?.copy(id = it.id)
                 }
+
+                list.forEach { recipe ->
+                    Log.d(
+                        "PRIVATE_CHECK",
+                        "${recipe.title} -> isPublic = ${recipe.isPublic}"
+                    )
+                }
+
+                _myRecipes.value = list
 
             } catch (e: Exception) {
 
                 Log.e("MY_RECIPES", e.message ?: "", e)
 
                 _recipeState.value =
-                    RecipeState.Error(e.message ?: "Failed to load recipes")
+                    RecipeState.Error(e.message ?: "Failed to load my recipes")
 
             }
 
         }
 
     }
+
+    // MY RECIPES (Public + Private)
+
 
     fun uploadRecipe(
         context: Context,
@@ -174,8 +178,6 @@ class RecipeViewModel : ViewModel() {
     ) {
 
         viewModelScope.launch {
-
-            _recipeState.value = RecipeState.Loading
 
             try {
 
