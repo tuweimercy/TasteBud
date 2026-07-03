@@ -143,20 +143,36 @@ fun LoginScreen(navController: NavController,
             )
             
             Spacer(Modifier.height(32.dp))
-
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color(0xFFE91E63)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = null,
+                        tint = Color(0xFFE91E63)
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+
+                textStyle = LocalTextStyle.current.copy(
+                    color = Color.Black
+                ),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFE91E63),
+                    focusedBorderColor = Color(0xFFE91E63),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color(0xFFE91E63),
+                    unfocusedLabelColor = Color.Gray
+                )
             )
-            
-            Spacer(Modifier.height(16.dp))
-            
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -164,18 +180,47 @@ fun LoginScreen(navController: NavController,
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFFE91E63)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = Color(0xFFE91E63)
+                    )
+                },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            if (passwordVisible)
+                                Icons.Default.VisibilityOff
+                            else
+                                Icons.Default.Visibility,
                             contentDescription = null,
                             tint = Color(0xFFE91E63)
                         )
                     }
                 },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation =
+                    if (passwordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+
+                textStyle = LocalTextStyle.current.copy(
+                    color = Color.Black
+                ),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFE91E63),
+                    focusedBorderColor = Color(0xFFE91E63),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color(0xFFE91E63),
+                    unfocusedLabelColor = Color.Gray
+                )
             )
+
+
             
             Spacer(Modifier.height(8.dp))
             

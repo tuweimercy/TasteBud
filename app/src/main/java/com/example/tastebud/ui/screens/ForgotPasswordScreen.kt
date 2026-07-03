@@ -173,7 +173,6 @@ fun ForgotPasswordScreen(navController: NavController,
                 )
 
                 Spacer(Modifier.height(32.dp))
-
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -188,8 +187,26 @@ fun ForgotPasswordScreen(navController: NavController,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email
+                    ),
+
+                    textStyle = LocalTextStyle.current.copy(
+                        color = Color.Black
+                    ),
+
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        cursorColor = Color(0xFFE91E63),
+                        focusedBorderColor = Color(0xFFE91E63),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = Color(0xFFE91E63),
+                        unfocusedLabelColor = Color.Gray
+                    )
                 )
+
+
 
                 Spacer(Modifier.height(24.dp))
 

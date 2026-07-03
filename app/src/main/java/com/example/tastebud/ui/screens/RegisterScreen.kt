@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Email
@@ -142,64 +143,134 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = v
             )
 
             Spacer(Modifier.height(32.dp))
-
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
                 label = { Text("Full Name") },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFFE91E63)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = null,
+                        tint = Color(0xFFE91E63)
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFE91E63),
+                    focusedBorderColor = Color(0xFFE91E63),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color(0xFFE91E63),
+                    unfocusedLabelColor = Color.Gray
+                )
             )
-
-            Spacer(Modifier.height(16.dp))
-
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color(0xFFE91E63)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = null,
+                        tint = Color(0xFFE91E63)
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFE91E63),
+                    focusedBorderColor = Color(0xFFE91E63),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color(0xFFE91E63),
+                    unfocusedLabelColor = Color.Gray
+                )
             )
-
-            Spacer(Modifier.height(12.dp))
-
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFFE91E63)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = Color(0xFFE91E63)
+                    )
+                },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            if (passwordVisible)
+                                Icons.Default.VisibilityOff
+                            else
+                                Icons.Default.Visibility,
                             contentDescription = null,
                             tint = Color(0xFFE91E63)
                         )
                     }
                 },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation =
+                    if (passwordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
+
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFE91E63),
+                    focusedBorderColor = Color(0xFFE91E63),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color(0xFFE91E63),
+                    unfocusedLabelColor = Color.Gray
+                )
             )
-
-            Spacer(Modifier.height(12.dp))
-
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
                 label = { Text("Confirm Password") },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFFE91E63)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = Color(0xFFE91E63)
+                    )
+                },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
+
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFE91E63),
+                    focusedBorderColor = Color(0xFFE91E63),
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color(0xFFE91E63),
+                    unfocusedLabelColor = Color.Gray
+                )
             )
+
 
             Spacer(Modifier.height(20.dp))
 
