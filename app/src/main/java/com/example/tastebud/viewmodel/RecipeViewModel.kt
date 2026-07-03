@@ -68,16 +68,35 @@ class RecipeViewModel : ViewModel() {
         viewModelScope.launch {
 
             try {
-
                 val snapshot = db.collection("recipes")
                     .whereEqualTo("ownerId", uid)
                     .orderBy("uploadedAt", Query.Direction.DESCENDING)
-                    .get()
+                    .get(com.google.firebase.firestore.Source.SERVER)
                     .await()
+                val list = snapshot.documents.map { doc ->
 
-                val list = snapshot.documents.mapNotNull {
-                    it.toObject(Recipe::class.java)?.copy(id = it.id)
+                    Log.d("FIRESTORE", "Title = ${doc.getString("title")}")
+                    Log.d("FIRESTORE", "Raw isPublic = ${doc.getBoolean("isPublic")}")
+
+                    Recipe(
+                        id = doc.id,
+                        title = doc.getString("title") ?: "",
+                        ingredients = doc.getString("ingredients") ?: "",
+                        instructions = doc.getString("instructions") ?: "",
+                        imageUrl = doc.getString("imageUrl") ?: "",
+                        category = doc.getString("category") ?: "",
+                        cookingTime = (doc.getLong("cookingTime") ?: 0).toInt(),
+                        isPublic = doc.getBoolean("isPublic") ?: false,
+                        ownerName = doc.getString("ownerName") ?: "",
+                        ownerId = doc.getString("ownerId") ?: "",
+                        likes = (doc.getLong("likes") ?: 0).toInt(),
+                        uploadedAt = doc.getTimestamp("uploadedAt")
+                            ?: com.google.firebase.Timestamp.now()
+                    )
                 }
+
+
+
 
                 list.forEach { recipe ->
                     Log.d(
@@ -180,6 +199,8 @@ class RecipeViewModel : ViewModel() {
         viewModelScope.launch {
 
             try {
+                Log.d("UPDATE", "Saving recipe: $recipeId")
+                Log.d("UPDATE", "isPublic = $isPublic")
 
                 db.collection("recipes")
                     .document(recipeId)
@@ -194,6 +215,9 @@ class RecipeViewModel : ViewModel() {
                         )
                     )
                     .await()
+
+                Log.d("UPDATE", "Recipe updated successfully")
+
 
                 _recipeState.value = RecipeState.Success
 
