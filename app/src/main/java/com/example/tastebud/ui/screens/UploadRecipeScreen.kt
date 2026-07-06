@@ -124,35 +124,43 @@ fun UploadRecipeScreen(
                     }
                 }
             }
-
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Recipe Title") },
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
                 leadingIcon = { Icon(Icons.Default.RestaurantMenu, null, tint = Pink) },
                 shape = RoundedCornerShape(12.dp)
             )
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 OutlinedTextField(
                     value = cookingTime,
                     onValueChange = { if (it.all { char -> char.isDigit() }) cookingTime = it },
                     modifier = Modifier.weight(1f),
                     label = { Text("Time (mins)") },
+                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
                     leadingIcon = { Icon(Icons.Default.Timer, null, tint = Pink) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(12.dp)
                 )
-                
+
                 Card(
-                    modifier = Modifier.weight(1f).height(56.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     border = BorderStroke(1.dp, Color.LightGray)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -171,6 +179,7 @@ fun UploadRecipeScreen(
                 onValueChange = { ingredients = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Ingredients") },
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
                 minLines = 4,
                 shape = RoundedCornerShape(12.dp)
             )
@@ -180,9 +189,11 @@ fun UploadRecipeScreen(
                 onValueChange = { instructions = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Instructions") },
+                textStyle = LocalTextStyle.current.copy(color = Color.Black),
                 minLines = 5,
                 shape = RoundedCornerShape(12.dp)
             )
+
 
             Text("Category", style = MaterialTheme.typography.titleMedium, color = Pink)
 //            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

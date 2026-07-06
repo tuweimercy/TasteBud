@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -313,7 +314,9 @@ fun RegisterScreen(navController: NavController,authViewModel: AuthViewModel = v
             Button(
                 onClick = {
                     if(password == confirmPassword){
-                        authViewModel.register(fullName,email,password,)
+                        authViewModel.register(fullName,
+                            email,
+                            password)
 //                            selectedRole)
                     }
                 },
